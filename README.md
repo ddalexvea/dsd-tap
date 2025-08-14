@@ -53,7 +53,7 @@ Expected output:
 ````
 default       dsd-tap-nlrjs                                  1/1     Running   0               28s
 ````
-4)Verify that the pod logs:
+4)Verify the pod logs:
 ````
 kubectl logs $(kubectl get pod -l app=dsd-tap -o jsonpath='{.items[0].metadata.name}')
 ````
