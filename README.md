@@ -9,6 +9,19 @@ Features:
 - The dogstatsd pods are not monitored thank to this annotation `ad.datadoghq.com/metrics_exclude: "true"`
 - The script stdouts the logs, so if your pod agents collect all containers logs, it will generate logs with service tag and value `dsd-tap` in Datadog UI.
 
+### Schema
+
+```mermaid
+graph TD
+
+subgraph Kubernetes Cluster
+  A[App or sidecar] -- "UDS packet: custom.metric.name:1|c|#env:prod" --> B[dsd-tap DaemonSet pod: /var/run/datadog/dsd.socket]
+  B -- payload log --> D[stdout / kubectl logs]
+  B -- forward UDS packet --> C["Dogstatsd/Datadog Agent: /var/run/datadog/dsd.socket.real"]
+  C -- custom metrics --> DD[Datadog Metrics backend]
+end
+```
+
 ## How to implement
 Prerequisite:
 
