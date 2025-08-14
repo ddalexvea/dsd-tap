@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dsd-tap-script
+  namespace: default
+data:
+  dsd_tap_min.py: |
+    import os, socket, time
+
+    LP = "/host-datadog/dsd.socket"
+    FP = "/host-datadog/dsd.socket.real"
+    BUF = 8192
+
+    def log(msg):
+        ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        print(f"[{ts}] {msg}", flush=True)
+
+    def main():
+        try: os.unlink(LP)
+        except FileNotFoundError: pass
+
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        s.bind(LP)
+        os.chmod(LP, 0o666)
+
+        fwd = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        log(f"TAP started {LP} -> {FP}")
+
+        while True:
+            data = s.recv(BUF)
+            log(f"bytes={len(data)} payload=\"{data.decode('utf-8', 'replace')}\"")
+            try:
+                fwd.sendto(data, FP)
+            except Exception as e:
+                log(f"forward_error: {e}")
+
+    main()
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dsd-tap
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: dsd-tap
+  template:
+    metadata:
+      labels:
+        app: dsd-tap
+      annotations:
+        ad.datadoghq.com/metrics_exclude: "true"
+        ad.datadoghq.com/tap.logs: '[{"service": "dsd-tap"}]'
+    spec:
+      containers:
+        - name: tap
+          image: python:3.11-slim
+          command: ["python3", "-u", "/opt/dsd_tap_min.py"]
+          volumeMounts:
+            - name: host-datadog
+              mountPath: /host-datadog
+            - name: tap-script
+              mountPath: /opt
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 20Mi
+            limits:
+              cpu: 50m
+              memory: 50Mi
+      volumes:
+        - name: host-datadog
+          hostPath:
+            path: /var/run/datadog
+            type: DirectoryOrCreate
+        - name: tap-script
+          configMap:
+            name: dsd-tap-script
+            defaultMode: 0755
