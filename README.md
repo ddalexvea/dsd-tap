@@ -15,11 +15,11 @@ Features:
 graph TD
 
 subgraph Kubernetes Cluster
-  A[App or sidecar] -- "UDS packets: custom.metric.name:1|c" --> B[dsd-tap DaemonSet pod: /var/run/datadog/dsd.socket]
+  A[App or sidecar] -- "sent UDS packets: custom.metric.name:1|c" --> B[dsd-tap DaemonSet pod: /var/run/datadog/dsd.socket]
   B -- "generated logs" --> D[stdout / kubectl logs collected by the Agent]
-  B -- forward UDS packets --> C["Dogstatsd/Datadog Agent: /var/run/datadog/dsd.socket.real"]
-  C -- custom metrics payload --> DD[Datadog backend]
-  D -- logs payload --> DD[Datadog backend]
+  B -- forwarded UDS packets --> C["Dogstatsd/Datadog Agent: /var/run/datadog/dsd.socket.real"]
+  C -- sent custom metrics payload --> DD[Datadog backend]
+  D -- sent logs payload --> DD[Datadog backend]
 end
 ```
 
