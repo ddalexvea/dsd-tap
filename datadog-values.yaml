@@ -1,0 +1,12 @@
+datadog:
+  site: "datadoghq.com"
+  apiKeyExistingSecret: "datadog-secret"
+  clusterName: test-cluster
+  kubelet:
+    tlsVerify: false
+  logs:
+    enabled: true
+    containerCollectAll: true
+  dogstatsd:
+    useSocketVolume: true
+    socketPath: /var/run/datadog/dsd.socket.real  # This path will be bind-mounted
