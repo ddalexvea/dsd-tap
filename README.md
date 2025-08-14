@@ -2,6 +2,7 @@
 Dogstatsd TAP for UDS, to log the custom metrics for a long time period, when activating agent trace log level is not an option.
 
 Note that by enabling Datadog agent trace log level, this information will be retrieve ([source](https://github.com/DataDog/datadog-agent/blob/12d4b3eacc7c4156c3c0bc769d2cdc241d4b964c/comp/dogstatsd/server/server.go#L729))
+Provided a [datadog-values.yaml](https://github.com/ddalexvea/dsd-tap/blob/main/datadog-values.yaml) for sandbox
 
 ## How to implement
 Prerequisite:
@@ -73,6 +74,6 @@ kubectl delete daemonset dsd-tap -n default
 kubectl delete configmap dsd-tap-script -n default
 ````
 
-### Documentation:
+### Documentation regarding Dogstatsd over UDS:
 
 https://docs.datadoghq.com/developers/dogstatsd/unix_socket/?tab=host
