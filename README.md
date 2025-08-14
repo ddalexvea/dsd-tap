@@ -91,8 +91,8 @@ kubectl logs $(kubectl get pod -l app=dsd-tap -o jsonpath='{.items[0].metadata.n
 
 ### How to delete the DaemonSet and ConfigMap
 ````
-kubectl delete daemonset dsd-tap -n default
-kubectl delete configmap dsd-tap-script -n default
+kubectl delete daemonset dsd-tap
+kubectl delete configmap dsd-tap-script
 ````
 
 ### Documentation regarding Dogstatsd over UDS:
